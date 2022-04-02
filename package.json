@@ -1,0 +1,27 @@
+{
+  "name": "cypher_bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@discordjs/builders": "^0.11.0",
+    "@discordjs/rest": "^0.3.0",
+    "@liamcottle/valorant.js": "github:liamcottle/valorant.js",
+    "@supabase/supabase-js": "^1.31.1",
+    "axios": "^0.21.4",
+    "discord-api-types": "^0.26.1",
+    "discord-timestamps": "^0.1.4",
+    "discord.js": "^13.6.0",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "showdown": "^2.0.3",
+    "valorant-xmpp-client": "^1.0.0-test.2"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "slash": "node deploy_commands.js",
+    "config-secrets": "node fly_secrets.js"
+  },
+  "author": "Kry0",
+  "license": "MIT"
+}

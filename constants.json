@@ -1,0 +1,7 @@
+{
+    "GAME_TYPE_MAP": {
+      "league_of_legends": "League Of Legends",
+      "valorant": "Valorant",
+      "other": "Other"
+    }
+}

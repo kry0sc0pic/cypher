@@ -1,0 +1,6 @@
+version: '3.6'
+services:
+  cypher:
+    build: .
+    env_file:
+      - .env
