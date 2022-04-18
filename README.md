@@ -28,6 +28,7 @@ Player Status without needing to launch Valorant or Riot Mobile
 <ul>
 <li> Detection for Other Riot Games </li>
 <li> Add Slash Command  </li>
+<li> Playtime tracker and graph </li>
 </ul>
 
 ### Setup Guide
