@@ -1,12 +1,11 @@
 // Load ENV Vars
 require('dotenv').config();
-
 // Import Packages
 const { Builders, ValorantXmppClient } = require('valorant-xmpp-client');
 const { Client, Intents } = require('discord.js');
 const Valorant = require('@liamcottle/valorant.js');
 const { createClient } = require('@supabase/supabase-js');
-const express = require('express'); // Required for https://fly.io deployment , I have no idea if this helps or not
+const express = require('express'); // Required for https://fly.io deployment health check
 const { default: axios } = require('axios');
 
 const { STATUS_BOARD_CHANNEL_ID, STATUS_BOARD_MESSAGE_ID, RIOT_USERNAME, RIOT_TAGLINE, BANNER_IMAGE_URL, UPDATE_EVERY_X_MINUTES } = require('./config.json');
@@ -17,15 +16,39 @@ const { PresenceBuilder, KeystonePresenceBuilder, ValorantPresenceBuilder } = Bu
 const discordClient = new Client({ intents: [Intents.FLAGS.GUILDS] });
 const supabaseClient = createClient(process.env.SUPABASE_ENDPOINT, process.env.SUPABASE_ANONKEY);
 
-// const converter = new showdown.Converter();
 const xmppClient = new ValorantXmppClient();
 const app = express();
-const version = 'v1.0.0-BETA';
+const version = 'v1.0.0';
+
 
 let uuid_map = {};
 let status_map = {};
 let RIOT_ENTITLEMENT_TOKEN = process.env.RIOT_ENTITLEMENT_TOKEN;
 let RIOT_BEARER_TOKEN = process.env.RIOT_BEARER_TOKEN;
+
+
+// Task to make a dummy entry and delete it to not have supabase deactivate the database
+const supabasePlzNoDie = async () => {
+    // supabaseClient.
+//TODO: Write a dummy record, wait 1 second and delete it. Then set a delay to run this task again.
+
+    supabaseClient.from('uuid_map').insert({
+        uuid: 'plznodie',
+        display_name: 'plznodie',
+        game_name: 'plznodie',
+        tag_line: 'plznodie',
+    }).then((_) => {
+        supabaseClient.from('uuid_map').where('uuid', 'plznodie').delete().then((_) => {
+            setTimeout(supabasePlzNoDie, 1000 * 60 * 5);
+        }).catch((err) => {
+            console.log(err);
+
+        });
+
+    }).catch((err) => {
+        console.log(err);
+    });
+};
 // Task to Update Status Board
 const updateStatusBoard = async () => {
 
@@ -486,13 +509,10 @@ xmppClient.on('presence', async (data) => {
     }
 
 });
-
-
 xmppClient.on('error', (err) => {
     console.log('XMPP | Client Error: ' + err);
 
 });
-
 // Discord Client Callbacks
 discordClient.on('ready', async () => {
     console.log(`DISCORD | Logged in as ${discordClient.user.tag}!`);
@@ -528,16 +548,15 @@ discordClient.on('ready', async () => {
     }).then((_) => {
         console.log('DISCORD | Status Board Message Updated');
         setTimeout(updateStatusBoard, 10000);
+        setTimeout(supabasePlzNoDie, 2000);
     }).catch(err => {
         console.log(err);
     })
 
 });
-
 // Startup Things
 xmppClient.login({ username: process.env.RIOT_USERNAME, password: process.env.RIOT_PASSWORD });
 discordClient.login(process.env.TOKEN);
-
 // Add Command
 discordClient.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) return;
@@ -556,7 +575,7 @@ discordClient.on('interactionCreate', async interaction => {
 })
 
 
-// Run Webserver for https://fly.io health check , no idea if this helps or no
+// Run Webserver for https://fly.io health check
 app.get('/', (req, res) => {
     res.send('<h1>Cypher Bot</h1>');
 });

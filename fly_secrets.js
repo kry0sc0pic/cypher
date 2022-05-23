@@ -6,8 +6,6 @@ Object.keys(vars).forEach((key, i) => {
   let v = vars[key];
   console.log(`Setting Secret ${i+1} -> ${k}`);
   exec(`flyctl secrets set ${k}=${v}`);
-
-
 });
 
 console.log('\n Set Secrets\n');
