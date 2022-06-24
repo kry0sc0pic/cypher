@@ -18,7 +18,7 @@ const supabaseClient = createClient(process.env.SUPABASE_ENDPOINT, process.env.S
 
 const xmppClient = new ValorantXmppClient();
 const app = express();
-const version = 'v1.0.0';
+const version = 'v1.0.1';
 
 
 let uuid_map = {};
@@ -108,14 +108,18 @@ supabaseClient.from('uuid_map').select().then((users, error) => {
         return null;
     } else {
         console.log("Retrieved UUID Map");
-
-        users['data'].forEach(element => {
-            uuid_map[element['uuid']] = {
-                'display_name': element['display_name'],
-                'game_name': element['game_name'],
-                'tag_line': element['tag_line'],
-            };
-        });
+        if(users === null){
+            console.log("UUID Map seems empty");
+        }
+        else {
+            users['data'].forEach(element => {
+                uuid_map[element['uuid']] = {
+                    'display_name': element['display_name'],
+                    'game_name': element['game_name'],
+                    'tag_line': element['tag_line'],
+                };
+            });
+        }
     }
 });
 
